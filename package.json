@@ -1,0 +1,14 @@
+{
+  "name": "moss-voice-agent-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server/index.mjs",
+    "start": "node server/index.mjs",
+    "check": "node --check server/index.mjs"
+  },
+  "dependencies": {
+    "@moss-dev/moss": "latest"
+  }
+}
