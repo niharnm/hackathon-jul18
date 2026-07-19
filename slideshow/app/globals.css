@@ -76,3 +76,12 @@
 .slide-four .stack-bottom{border-color:rgba(134,202,214,.45)}
 .slide-foot,.bottom-hint{z-index:4}
 @media(max-width:700px){.slide-viewport{padding:9px 9px 12px;height:calc(100svh - 68px)}.slide{height:calc(100svh - 89px);min-height:620px;border-radius:24px}.slide-two:before,.slide-three:before{top:-55px;right:-10%;width:230px;height:230px}.slide-two:after,.slide-three:after{bottom:-67px;height:140px}.slide-two,.slide-three,.slide-four{background:radial-gradient(circle at 73% 18%,rgba(255,246,176,.46) 0 9%,transparent 26%),repeating-conic-gradient(from 248deg at 73% 18%,rgba(255,246,176,.14) 0 6deg,transparent 6deg 18deg),linear-gradient(180deg,#b4edf8 0%,#dff8fc 45%,#52c6df 46%,#2eaccb 70%,#2290b8 78%,#f5d993 79%,#f0c477 100%)} }
+
+/* Integrated frame: header, progress, and slide read as one board. */
+.deck-shell:before{top:12px;left:16px;right:16px;border-radius:32px 32px 0 0}
+.deck-nav{margin:12px 16px 0;border:1px solid rgba(133,205,224,.72);border-bottom:0;border-radius:32px 32px 0 0;background:linear-gradient(180deg,rgba(223,248,252,.94),rgba(205,241,248,.88));box-shadow:0 8px 24px rgba(67,143,165,.08);}
+.slide-viewport{padding:0 16px 18px;height:calc(100svh - 90px)}
+.slide{height:calc(100svh - 108px);border-top:0;border-radius:0 0 32px 32px;box-shadow:0 18px 40px rgba(67,143,165,.12),inset 0 -1px rgba(255,255,255,.72)}
+.progress-track{top:90px;left:16px;right:16px;border-radius:0 0 32px 32px;overflow:hidden}
+.bottom-hint{bottom:23px}
+@media(max-width:700px){.deck-shell:before{top:9px;left:9px;right:9px;border-radius:24px 24px 0 0}.deck-nav{margin:9px 9px 0;border-radius:24px 24px 0 0}.slide-viewport{padding:0 9px 12px;height:calc(100svh - 77px)}.slide{height:calc(100svh - 89px);border-radius:0 0 24px 24px}.progress-track{top:77px;left:9px;right:9px}.bottom-hint{bottom:17px}}
