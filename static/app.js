@@ -4,6 +4,7 @@ const hint = document.querySelector('#hint');
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition;
 let activeAudio;
+const conversationHistory = [];
 
 function setState(label, detail) {
   state.textContent = label;
@@ -47,10 +48,15 @@ async function ask(query) {
   const response = await fetch('/api/ask', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({ query, history: conversationHistory }),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.detail || 'The request failed');
+  conversationHistory.push(
+    { role: 'user', content: query },
+    { role: 'assistant', content: data.answer },
+  );
+  if (conversationHistory.length > 8) conversationHistory.splice(0, conversationHistory.length - 8);
   setState('Answering', 'Armani has it.');
   await speak(data.answer);
 }
