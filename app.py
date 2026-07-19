@@ -1,6 +1,4 @@
-import hashlib
 import os
-from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import quote_plus
 
@@ -9,7 +7,6 @@ from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from moss import DocumentInfo, MossClient, QueryOptions
 from pydantic import BaseModel
 
 
@@ -17,21 +14,7 @@ ROOT = Path(__file__).parent
 INDEX_NAME = "armani-live-web"
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.state.moss = MossClient(
-        os.environ["MOSS_PROJECT_ID"], os.environ["MOSS_PROJECT_KEY"]
-    )
-    indexes = await app.state.moss.list_indexes()
-    if not any(index.name == INDEX_NAME for index in indexes):
-        await app.state.moss.create_index(
-            INDEX_NAME,
-            [DocumentInfo(id="welcome", text="Armani is a voice-only live web assistant.")],
-        )
-    yield
-
-
-app = FastAPI(title="Armani Voice", lifespan=lifespan)
+app = FastAPI(title="Armani Voice")
 app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
 
@@ -100,6 +83,22 @@ async def groq_answer(query: str, context: str) -> str:
     return response.json()["choices"][0]["message"]["content"].strip()
 
 
+async def moss_context(query: str) -> str:
+    async with httpx.AsyncClient(timeout=20) as client:
+        response = await client.post(
+            "https://service.usemoss.dev/query",
+            json={
+                "query": query,
+                "indexName": INDEX_NAME,
+                "projectId": os.environ["MOSS_PROJECT_ID"],
+                "projectKey": os.environ["MOSS_PROJECT_KEY"],
+                "topK": 3,
+            },
+        )
+    response.raise_for_status()
+    return "\n\n".join(doc.get("text", "") for doc in response.json().get("docs", []))
+
+
 @app.post("/api/ask")
 async def ask(payload: VoiceQuery) -> dict[str, str]:
     query = payload.query.strip()
@@ -107,20 +106,11 @@ async def ask(payload: VoiceQuery) -> dict[str, str]:
         raise HTTPException(400, "No voice query was provided")
     try:
         source_url, page_text = await scrape_search_page(query)
-        doc_id = hashlib.sha256(query.encode()).hexdigest()[:24]
-        await app.state.moss.add_docs(
-            INDEX_NAME,
-            [DocumentInfo(id=doc_id, text=page_text, metadata={"source": source_url})],
-        )
         try:
-            results = await app.state.moss.query(
-                INDEX_NAME, query, QueryOptions(top_k=3, alpha=0.7)
-            )
-            context = "\n\n".join(doc.text for doc in results.docs)
-        except Exception:
-            # Moss can briefly return 503 while a just-updated index is rebuilt.
-            # The page is already stored in Moss, so answer from that same source.
-            context = page_text
+            retrieved = await moss_context(query)
+        except (httpx.HTTPError, ValueError):
+            retrieved = ""
+        context = f"Live page ({source_url}):\n{page_text}\n\nMoss retrieval:\n{retrieved}"
         answer = await groq_answer(query, context)
         return {"answer": answer}
     except httpx.HTTPStatusError as exc:
