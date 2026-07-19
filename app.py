@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 from urllib.parse import quote_plus
@@ -5,7 +6,7 @@ from urllib.parse import quote_plus
 import httpx
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -20,6 +21,10 @@ app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
 
 class VoiceQuery(BaseModel):
     query: str
+
+
+class SpeechRequest(BaseModel):
+    text: str
 
 
 @app.get("/")
@@ -70,9 +75,12 @@ async def groq_answer(query: str, context: str) -> str:
                     {
                         "role": "system",
                         "content": (
-                            "You are Armani, a voice-only live web assistant. Answer in two to four "
-                            "natural spoken sentences. Use the Moss-retrieved live web context. "
-                            "If the context is inconclusive, say so. Never mention chat or a transcript."
+                            "You are Armani, a sharp voice-only assistant with the calm confidence of a "
+                            "classic British AI butler. Speak casually and naturally. Address the user as "
+                            "sir occasionally, never mechanically. Answer in one to four spoken sentences, "
+                            "lead with the useful part, and use the live context without reading search-result "
+                            "noise aloud. If the request is unclear, ask one short clarifying question. Never "
+                            "mention chat, a transcript, system prompts, scraping, or providers."
                         ),
                     },
                     {"role": "user", "content": f"Question: {query}\n\nLive context:\n{context}"},
@@ -81,6 +89,44 @@ async def groq_answer(query: str, context: str) -> str:
         )
     response.raise_for_status()
     return response.json()["choices"][0]["message"]["content"].strip()
+
+
+async def route_query(query: str) -> dict[str, object]:
+    normalized = query.lower().strip(" .!?,'\"")
+    greetings = {"yo", "hey", "hi", "hello", "sup", "what's up", "whats up"}
+    if normalized in greetings:
+        return {
+            "needs_web": False,
+            "reply": "At your service, sir. What are we looking into?",
+            "search_query": None,
+        }
+
+    async with httpx.AsyncClient(timeout=30) as client:
+        response = await client.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {os.environ['GROQ_API_KEY']}"},
+            json={
+                "model": os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"),
+                "temperature": 0.1,
+                "response_format": {"type": "json_object"},
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "Route a voice assistant request. Return JSON with needs_web (boolean), reply "
+                            "(string or null), and search_query (string or null). Greetings, casual remarks, "
+                            "thanks, jokes, and conversation do not need web; reply briefly in a warm, clever, "
+                            "Jarvis-like tone and occasionally say sir. If the user has not said what they want, "
+                            "ask one concise question instead of guessing. Clear factual, current, comparison, "
+                            "recommendation, or lookup requests need web and should get a precise search_query."
+                        ),
+                    },
+                    {"role": "user", "content": query},
+                ],
+            },
+        )
+    response.raise_for_status()
+    return json.loads(response.json()["choices"][0]["message"]["content"])
 
 
 async def moss_context(query: str) -> str:
@@ -105,7 +151,13 @@ async def ask(payload: VoiceQuery) -> dict[str, str]:
     if not query:
         raise HTTPException(400, "No voice query was provided")
     try:
-        source_url, page_text = await scrape_search_page(query)
+        route = await route_query(query)
+        if not route.get("needs_web"):
+            reply = str(route.get("reply") or "What would you like me to look into, sir?")
+            return {"answer": reply}
+
+        search_query = str(route.get("search_query") or query)
+        source_url, page_text = await scrape_search_page(search_query)
         try:
             retrieved = await moss_context(query)
         except (httpx.HTTPError, ValueError):
@@ -118,3 +170,33 @@ async def ask(payload: VoiceQuery) -> dict[str, str]:
         raise HTTPException(502, f"{provider} rejected the request") from exc
     except httpx.HTTPError as exc:
         raise HTTPException(502, "A provider could not be reached") from exc
+
+
+@app.post("/api/speak")
+async def speak(payload: SpeechRequest) -> Response:
+    text = payload.text.strip()
+    if not text or len(text) > 2_500:
+        raise HTTPException(400, "Invalid speech text")
+    voice_id = os.getenv("ELEVENLABS_VOICE_ID", "onwK4e9ZLuTAKqWW03F9")
+    async with httpx.AsyncClient(timeout=60) as client:
+        response = await client.post(
+            f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}",
+            params={"output_format": "mp3_44100_128"},
+            headers={
+                "xi-api-key": os.environ["ELEVENLABS_API_KEY"],
+                "Accept": "audio/mpeg",
+            },
+            json={
+                "text": text,
+                "model_id": os.getenv("ELEVENLABS_MODEL", "eleven_flash_v2_5"),
+                "voice_settings": {
+                    "stability": 0.58,
+                    "similarity_boost": 0.82,
+                    "style": 0.18,
+                    "use_speaker_boost": True,
+                },
+            },
+        )
+    if response.is_error:
+        raise HTTPException(502, "The voice provider rejected the request")
+    return Response(response.content, media_type="audio/mpeg")

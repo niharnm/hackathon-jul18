@@ -1,6 +1,6 @@
 # Armani Voice
 
-A small, voice-only live-web assistant. The browser handles speech input/output, Bright Data retrieves current web results, Moss indexes and retrieves the useful context, and Groq writes the spoken answer. There is no chat box or visible transcript.
+A small, voice-only live-web assistant. The browser handles speech input, ElevenLabs provides the voice, Bright Data retrieves current web results, Moss retrieves useful context, and Groq routes requests and writes the spoken answer. Casual conversation stays conversational instead of triggering a search. There is no chat box or visible transcript.
 
 ## Run
 
