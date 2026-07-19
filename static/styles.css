@@ -1,0 +1,23 @@
+:root { --ink:#17212a; --muted:#637482; --ice:#dbe6ef; --white:#f8fbfd; --blue:#315f78; --line:rgba(23,33,42,.14); }
+* { box-sizing:border-box; }
+body { margin:0; min-height:100vh; color:var(--ink); background:radial-gradient(circle at 72% 30%, #f7fbfe 0 8%, transparent 34%), var(--ice); font-family:Manrope,sans-serif; }
+main { min-height:100vh; display:grid; grid-template-rows:auto 1fr auto; padding:26px 34px; overflow:hidden; }
+header,footer { display:flex; align-items:center; justify-content:space-between; font-size:10px; font-weight:600; letter-spacing:.18em; }
+header { justify-content:flex-start; gap:12px; }
+.mark { width:27px; height:27px; display:grid; place-items:center; border:1px solid var(--ink); border-radius:50%; font-family:Syne,sans-serif; font-size:13px; }
+section { position:relative; align-self:center; width:min(920px,100%); margin:auto; }
+.eyebrow { color:var(--blue); font-size:12px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; }
+h1 { margin:15px 0 35px; font-family:Syne,sans-serif; font-size:clamp(58px,10vw,132px); font-weight:500; letter-spacing:-.065em; line-height:.83; }
+button { position:absolute; right:5%; top:50%; width:112px; height:112px; border:0; border-radius:50%; color:var(--white); background:var(--ink); cursor:pointer; display:grid; place-items:center; transition:transform .25s,background .25s; }
+button:hover { transform:scale(1.04); }
+button:focus-visible { outline:3px solid var(--blue); outline-offset:5px; }
+button svg { width:31px; fill:currentColor; }
+.rings { position:absolute; inset:-13px; border:1px solid var(--line); border-radius:50%; }
+.rings::after { content:""; position:absolute; inset:-14px; border:1px solid var(--line); border-radius:50%; }
+button.recording { background:#a43b35; }
+button.recording .rings { animation:pulse 1.4s infinite; }
+.hint { margin:0; color:var(--muted); font-size:13px; }
+footer { padding-top:18px; border-top:1px solid var(--line); color:var(--muted); }
+@keyframes pulse { 50% { transform:scale(1.13); opacity:.35; } }
+@media (max-width:700px) { main{padding:22px} section{padding-bottom:150px} h1{margin-top:12px} button{right:auto;top:auto;bottom:15px;left:4px;width:96px;height:96px} }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; } }
