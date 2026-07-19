@@ -57,3 +57,22 @@
 .slide-four .replay-button{border-color:#d9b879;color:var(--ink);background:rgba(255,255,255,.52);box-shadow:0 8px 20px rgba(132,91,35,.1)}.slide-four .replay-button:hover{background:#fff8e8}
 .slide-four .system-stack{border-color:rgba(210,183,125,.72);background:rgba(255,253,244,.72);box-shadow:0 25px 85px rgba(132,91,35,.16),inset 0 1px rgba(255,255,255,.8)}.slide-four .stack-label{color:#bd7041}.slide-four .stack-row{border-color:rgba(210,183,125,.45)}.slide-four .stack-row:hover{background:rgba(255,248,224,.7)}.slide-four .stack-icon{color:#0d8192;background:#e4f7f5}.slide-four .stack-row small{color:#6c8790}.slide-four .stack-live{color:#238d79}.slide-four .stack-bottom{border-color:rgba(210,183,125,.45);color:#a16b43}.slide-four .light-foot{color:#6f8b91}
 @media(max-width:700px){.slide-two:before,.slide-three:before{top:-110px;right:-8%;width:210px;height:210px}.slide-two:after,.slide-three:after{bottom:-118px;height:180px}.slide-four .deep-wave{width:125vw;height:125vw;right:-44%;bottom:-23%}}
+
+/* Screenshot-matched shell: rounded aqua scene, giant sunshine, glass, sea, and sand. */
+.deck-shell{background:#eff9fc}
+.slide-viewport{padding:12px 16px 18px;height:calc(100svh - 78px)}
+.slide{height:calc(100svh - 108px);min-height:520px;border:1px solid rgba(133,205,224,.72);border-radius:32px;box-shadow:0 18px 40px rgba(67,143,165,.12),inset 0 1px rgba(255,255,255,.72)}
+.slide-two,.slide-three,.slide-four{background:radial-gradient(circle at 68% 22%,rgba(255,246,176,.42) 0 8%,rgba(255,246,176,.18) 16%,transparent 27%),repeating-conic-gradient(from 248deg at 68% 22%,rgba(255,246,176,.17) 0 6deg,transparent 6deg 17deg),linear-gradient(180deg,#b4edf8 0%,#dff8fc 49%,#52c6df 50%,#2eaccb 72%,#2290b8 80%,#f5d993 81%,#f0c477 100%)}
+.slide-two:before,.slide-three:before{top:-32px;right:12%;width:315px;height:315px;background:radial-gradient(circle at 36% 31%,#fffde1,#fff2a2 39%,#ffe68d 55%,rgba(255,230,141,.14) 73%,transparent 74%);box-shadow:0 0 110px rgba(255,243,166,.82)}
+.slide-two:after,.slide-three:after{left:-5%;right:-5%;bottom:-85px;height:180px;background:linear-gradient(180deg,#f9e1a7,#edc071);box-shadow:0 -20px 42px rgba(255,255,255,.35)}
+.slide-two .slide-content,.slide-three .slide-content,.slide-four .slide-content{max-width:1120px}
+.slide-two .loop-grid,.slide-three .browser-card,.slide-three .signal-panel,.slide-two .quote-bar{box-shadow:0 16px 34px rgba(48,118,138,.13),inset 0 1px rgba(255,255,255,.75)}
+.slide-four{background:radial-gradient(circle at 68% 22%,rgba(255,246,176,.42) 0 8%,rgba(255,246,176,.18) 16%,transparent 27%),repeating-conic-gradient(from 248deg at 68% 22%,rgba(255,246,176,.17) 0 6deg,transparent 6deg 17deg),linear-gradient(180deg,#b4edf8 0%,#dff8fc 49%,#52c6df 50%,#2eaccb 72%,#2290b8 80%,#f5d993 81%,#f0c477 100%)}
+.slide-four:before{opacity:.16;background:linear-gradient(rgba(21,158,217,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(21,158,217,.12) 1px,transparent 1px);mask-image:linear-gradient(90deg,transparent,black 32%,black 72%,transparent)}
+.slide-four .deep-wave{border-color:rgba(7,111,137,.2);box-shadow:0 0 0 40px rgba(7,111,137,.06),0 0 0 85px rgba(7,111,137,.035),0 0 0 130px rgba(7,111,137,.02)}
+.slide-four .system-stack{background:rgba(244,252,252,.7);border-color:rgba(134,202,214,.8);box-shadow:0 18px 45px rgba(39,106,127,.16),inset 0 1px rgba(255,255,255,.85)}
+.slide-four .stack-row{border-color:rgba(134,202,214,.45)}
+.slide-four .stack-row:hover{background:rgba(255,255,255,.55)}
+.slide-four .stack-bottom{border-color:rgba(134,202,214,.45)}
+.slide-foot,.bottom-hint{z-index:4}
+@media(max-width:700px){.slide-viewport{padding:9px 9px 12px;height:calc(100svh - 68px)}.slide{height:calc(100svh - 89px);min-height:620px;border-radius:24px}.slide-two:before,.slide-three:before{top:-55px;right:-10%;width:230px;height:230px}.slide-two:after,.slide-three:after{bottom:-67px;height:140px}.slide-two,.slide-three,.slide-four{background:radial-gradient(circle at 73% 18%,rgba(255,246,176,.46) 0 9%,transparent 26%),repeating-conic-gradient(from 248deg at 73% 18%,rgba(255,246,176,.14) 0 6deg,transparent 6deg 18deg),linear-gradient(180deg,#b4edf8 0%,#dff8fc 45%,#52c6df 46%,#2eaccb 70%,#2290b8 78%,#f5d993 79%,#f0c477 100%)} }
